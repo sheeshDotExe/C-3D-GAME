@@ -7,6 +7,10 @@
 #include "../../resources/cglm/cglm.h"
 #include "../../resources/cglm/struct.h"
 
+#include <GLFW/glfw3.h>
+
+#include<stdio.h>
+
 struct Shader{
 	unsigned int ID;
 };
