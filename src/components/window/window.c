@@ -1,16 +1,15 @@
 #include "window.h"
-#include "../../utils/types.h"
 
 //global window
 int firstMouse = true;
 float lastX, lastY;
 struct Window window;
 
-static void _size_callback(GLFWwindow *window, int width, int height){
+static void _size_callback(GLFWwindow *windowW, int width, int height){
 	glViewport(0, 0, width, height);
 }
 
-static void _mouse_callback(GLFWwindow *window, double xposIn, double yposIn){
+static void _mouse_callback(GLFWwindow *windowW, double xposIn, double yposIn){
 	float xpos = (float)xposIn;
 	float ypos = (float)yposIn;
 
@@ -27,10 +26,12 @@ static void _mouse_callback(GLFWwindow *window, double xposIn, double yposIn){
 	lastX = xpos;
 	lastY = ypos;
 
+	processMouseMovement(&window.camera, xoffset, yoffset, true);
     //camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-static void _scroll_callback(GLFWwindow *window, double xoffset, double yoffset){
+static void _scroll_callback(GLFWwindow *windowW, double xoffset, double yoffset){
+	processMouseScroll(&window.camera, (float)yoffset);
 	//camera.ProcessMouseScroll((float)yoffset);
 }
 
@@ -51,6 +52,7 @@ int initWindow(int width, int height){
 
 	window.windowHandle = glfwCreateWindow(width, height, "OpenGL application", glfwGetPrimaryMonitor(), NULL);
 	glfwMakeContextCurrent(window.windowHandle);
+	glfwSwapInterval( 0 );
 
 	glfwSetFramebufferSizeCallback(window.windowHandle, _size_callback);
 	glfwSetCursorPosCallback(window.windowHandle, _mouse_callback);
@@ -65,11 +67,33 @@ int initWindow(int width, int height){
 	}
 	glEnable(GL_DEPTH_TEST);
 
+	window.camera = createCamera(0, 0, 0, CAMERA_MOVEMENT_SPEED, CAMERA_SENSITIVITY_X, CAMERA_SENSITIVITY_y, CAMERA_ZOOM);
+
 	return 0;
 }
 
-void windowLoop(){
+void windowLoop(struct GameState* gameState){
+
+	setCameraShader(&window.camera, &gameState->defaultShader);
+	char fpsBuffer[10];
+
+	setProjectionMatrix(&window.camera);
+
+	double startTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window.windowHandle)){
+
+		Sleep(1); // limit cpu usage (not recommended for running over 60 fps)
+		// clockTick reqeuries a window running with an event handler
+		clockTick(&gameState->clock, DEFAULT_FPS); //ensures program wont render more than parameters times per second
+
+		if (glfwGetTime() - startTime > 0.3){
+			gcvt(gameState->clock.currentFps, 10, fpsBuffer);
+			glfwSetWindowTitle(window.windowHandle, (const char*)fpsBuffer);
+			startTime = glfwGetTime();
+		}
+
+		setViewMatrix(&window.camera);
+
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

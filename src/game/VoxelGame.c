@@ -1,5 +1,4 @@
 #include "VoxelGame.h"
-#include "../components/window/window.h"
 
 int run(){
 
@@ -12,7 +11,14 @@ int run(){
 		return 1;
 	}
 
-	windowLoop();
+	struct GameState gameState;
+	gameState.defaultShader = createShader("C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/components/shaders/vertexShader.glsl", "C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/components/shaders/fragmentShader.glsl");
+	gameState.textureMap = createTexture("C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/spritemap.png");
+	gameState.clock = createClock();
+
+	clockInit(&gameState.clock);
+
+	windowLoop(&gameState);
 
 	return 0;
 }
