@@ -8,7 +8,10 @@
 #include "../world/textureMapper.h"
 #include "../world/clock.h"
 #include "../camera/camera.h"
-#include "windows.h"
+#include "../world/gen/biomeGen.h"
+#include <Windows.h>
+
+#pragma warning(disable : 4996)
 
 //#include "../../utils/types.h"
 
@@ -18,10 +21,15 @@
 #define CAMERA_SENSITIVITY_y 0.1
 #define CAMERA_ZOOM 45.0
 
+#define CAMERA_START_X 0
+#define CAMERA_START_Z 3
+#define CAMERA_START_Y 0
+
 struct GameState{
 	struct Shader defaultShader;
 	struct Texture textureMap;
 	struct ClockObject clock;
+	struct World world;
 };
 
 struct Window{
@@ -33,5 +41,6 @@ struct Window{
 
 int initWindow(int width, int height);
 void windowLoop(struct GameState* gameState);
+void worldUpdateLoop();
 
 #endif

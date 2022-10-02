@@ -11,10 +11,13 @@ int run(){
 		return 1;
 	}
 
+	struct texCoord* textureMap = generateTextureMap();
+
 	struct GameState gameState;
 	gameState.defaultShader = createShader("C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/components/shaders/vertexShader.glsl", "C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/components/shaders/fragmentShader.glsl");
 	gameState.textureMap = createTexture("C:/Users/Viktor/Documents/cpp/c-3dRendering/opengl/game/spritemap.png");
 	gameState.clock = createClock();
+	gameState.world = createWorld(RENDER_DISTANCE, (vec3s){CAMERA_START_X, CAMERA_START_Y, CAMERA_START_Z}, textureMap);
 
 	clockInit(&gameState.clock);
 

@@ -8,6 +8,16 @@
 #include "../shaders/shaderProgram.h"
 #include <math.h>
 
+enum CameraMovement
+{
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+};
+
 struct Camera{
 	struct Shader*shader;
 	vec3s position;
@@ -33,4 +43,5 @@ void createProjectionMatrix(struct Camera* camera);
 void setProjectionMatrix(struct Camera* camera);
 void setCameraShader(struct Camera* camera, struct Shader* shader);
 void setViewMatrix(struct Camera* camera);
+void processKeyboardInput(struct Camera* camera, enum CameraMovement direction, float deltaTime);
 #endif

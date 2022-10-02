@@ -10,13 +10,16 @@ void clockInit(struct ClockObject* clock){
 	clock->startTime = glfwGetTime();
 }
 
-void clockTick(struct ClockObject* clock, int frameRate){
+float clockTick(struct ClockObject* clock, int frameRate){
 	clock->currentTime = glfwGetTime();
-	clock->currentFps = 1/(clock->currentTime - clock->fpsStartTime);
+	float deltaTime = clock->currentTime - clock->fpsStartTime;
+	clock->currentFps = 1/(deltaTime);
 	clock->fpsStartTime = clock->currentTime;
 
 	while (glfwGetTime() < clock->startTime + 1.0/frameRate){
 		glfwPollEvents();
 	}
 	clock->startTime += 1.0/frameRate;
+
+	return deltaTime;
 }

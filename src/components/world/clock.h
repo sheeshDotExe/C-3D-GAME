@@ -3,7 +3,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <unistd.h>
+#include <io.h>
 #include <stdio.h>
 #include <windows.h>
 
@@ -18,5 +18,5 @@ struct ClockObject{
 
 struct ClockObject createClock();
 void clockInit(struct ClockObject* clock);
-void clockTick(struct ClockObject* clock, int frameRate);
+float clockTick(struct ClockObject* clock, int frameRate);
 #endif

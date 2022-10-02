@@ -59,18 +59,41 @@ void processMouseScroll(struct Camera* camera, float yoffset){
 	if (camera->zoom < 1.0f){
 		camera->zoom = 1.0f;
 	}
-	if (camera->zoom > 45.0f){
-		camera->zoom = 45.0f;
+	if (camera->zoom > 90.0f){
+		camera->zoom = 90.0f;
 	}
 	createProjectionMatrix(camera);
 	setProjectionMatrix(camera);
 }
 
+void processKeyboardInput(struct Camera* camera, enum CameraMovement direction, float deltaTime){
+	float velocity = camera->movementSpeed * deltaTime;
+	
+	if (direction == FORWARD)
+		camera->position = glms_vec3_add(camera->position, glms_vec3_scale(camera->front, velocity));
+	if (direction == BACKWARD)
+		camera->position = glms_vec3_sub(camera->position, glms_vec3_scale(camera->front, velocity));
+	if (direction == LEFT)
+		camera->position = glms_vec3_sub(camera->position, glms_vec3_scale(camera->right, velocity));
+	if (direction == RIGHT)
+		camera->position = glms_vec3_add(camera->position, glms_vec3_scale(camera->right, velocity));
+	if (direction == UP)
+		camera->position = glms_vec3_add(camera->position, glms_vec3_scale((vec3s){0, 1, 0}, velocity));
+	if (direction == DOWN)
+		camera->position = glms_vec3_sub(camera->position, glms_vec3_scale((vec3s){0, 1, 0}, velocity));
+	
+
+	//printf("%f %f %f\n", camera->position.x, camera->position.y, camera->position.z);
+
+	//updateCameraVectors(camera);
+}
+
 void createProjectionMatrix(struct Camera* camera){
-	camera->projectionMatrix = glms_perspective(glm_rad(camera->zoom), 1920.0/1080.0, 0.1, 1000.0);
+	camera->projectionMatrix = glms_perspective(glm_rad(camera->zoom), 1440.0/1080.0, 0.1, 1000.0);
 }
 
 void setProjectionMatrix(struct Camera* camera){
+	//printf("%f %f %f\n", camera->projectionMatrix.m00, camera->projectionMatrix.m11, camera->projectionMatrix.m22);
 	setMat4(camera->shader, (char*)"projection", camera->projectionMatrix);
 }
 
@@ -79,5 +102,6 @@ void setCameraShader(struct Camera* camera, struct Shader* shaderW){
 }
 
 void setViewMatrix(struct Camera* camera){
+	//printf("%f %f %f\n", getViewMatrix(camera).m00, getViewMatrix(camera).m11, getViewMatrix(camera).m22);
 	setMat4(camera->shader, (char*)"view", getViewMatrix(camera));
 }
