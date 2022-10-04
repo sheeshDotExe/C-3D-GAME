@@ -11,6 +11,7 @@ struct Mesh{
 	GLuint VAO;
 	GLuint VBO;
 	GLsizei size;
+	int shouldDraw;
 };
 
 struct Mesh createMesh();

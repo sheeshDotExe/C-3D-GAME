@@ -114,7 +114,7 @@ void windowLoop(struct GameState* gameState){
 	updateData.shouldRun = &threadRunning;
 	updateData.playerPosition = &window.camera.position;
 
-	//HANDLE updateThread = CreateThread(NULL, 0, chunkUpdateThread, (void*)&updateData, 0, NULL);
+	HANDLE updateThread = CreateThread(NULL, 0, chunkUpdateThread, (void*)&updateData, 0, NULL);
 
 	useShader(&gameState->defaultShader);
 

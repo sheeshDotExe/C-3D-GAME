@@ -16,6 +16,7 @@ struct World{
 	struct Chunk* chunks;
 	struct Tuple* chunkCoords;
 	struct HeightMap heightMap;
+	struct texCoord* textureMap;
 };
 
 struct Biome{

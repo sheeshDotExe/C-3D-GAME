@@ -21,7 +21,7 @@ struct Chunk createChunk(float x, float y, float z, float* heightMap);
 void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 	unsigned short int* rightChunk, unsigned short int* backChunk, unsigned short int* frontChunk, 
  	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP);
-
 void drawChunkSolid(struct Chunk* chunk, struct Shader* shader);
 void drawChunkTransparent(struct Chunk* chunk, struct Shader* shader);
+void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMap);
 #endif

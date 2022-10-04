@@ -36,12 +36,16 @@ void fillMesh(struct Mesh* mesh, float* vertices, int size){
 }
 
 void draw(struct Mesh* mesh){
-	glBindVertexArray(mesh->VAO);
-	glDrawArrays(GL_TRIANGLES, 0, mesh->size / 6);
-	glBindVertexArray(0);
+	if (mesh->shouldDraw) {
+		glBindVertexArray(mesh->VAO);
+		glDrawArrays(GL_TRIANGLES, 0, mesh->size / 6);
+		glBindVertexArray(0);
+	}
 }
 
 void clearMesh(struct Mesh* mesh){
 	glDeleteVertexArrays(1, &mesh->VAO);
 	glDeleteBuffers(1, &mesh->VBO);
+
+	//printf("%d %d\n", mesh->VAO, mesh->VBO);
 }

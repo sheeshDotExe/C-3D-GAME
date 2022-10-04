@@ -5,6 +5,7 @@ struct World createWorld(int renderDistance, vec3s cameraPosition, struct texCoo
 	world.renderDistance = renderDistance;
 	world.chunks = (struct Chunk*)malloc((renderDistance*2+1)*(renderDistance*2+1)*sizeof(struct Chunk));
 	world.chunkCoords = (struct Tuple*)malloc((renderDistance*2+1)*(renderDistance*2+1)*sizeof(struct Tuple));
+	world.textureMap = TEXTURE_MAP;
 
 	int startX = (int)(cameraPosition.x / CHUNK_WIDTH);
 	int startY = (int)(cameraPosition.y / CHUNK_HEIGHT);
@@ -65,17 +66,38 @@ void initChunkMeshes(struct Tuple* chunkCoords, struct Chunk* chunks, int render
 	}
 }
 
+static void _addUpdate(struct Tuple* map, unsigned int* pos, struct Tuple value) {
+	map[*pos] = value;
+	(*pos)++;
+}
+
 DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 	struct UpdateThreadData* threadData = (struct UpdateThreadData*)ThreadData;
+	
+	printf("thread start\n");
+
+	struct Tuple * updatePositions;
+	unsigned int updateSize; // number of chunks to update
 
 	while(*threadData->shouldRun){
 		Sleep(20);
+
+		updatePositions = (struct Tuple*)malloc((threadData->world->renderDistance * 2 + 1) * (threadData->world->renderDistance * 2 + 1) * sizeof(struct Tuple));
+		
+		if (updatePositions == NULL) {
+			printf("Malloc failed\n");
+		}
+		
+		updateSize = 0;
+
 		int startX = (int)(threadData->playerPosition->x / CHUNK_WIDTH);
 		int startY = (int)(threadData->playerPosition->y / CHUNK_HEIGHT);
 		int startZ = (int)(threadData->playerPosition->z / CHUNK_DEPTH);
 
 		vec3s position;
 		struct Tuple chunkPosition;
+
+		struct Tuple firstCoord;
 
 		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++)
 		{
@@ -85,22 +107,40 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 				position.x /= CHUNK_WIDTH;
 				position.y /= CHUNK_HEIGHT;
 				position.z /= CHUNK_DEPTH;
-				//printf("x:%f y:%f z:%f\n", position.x, position.y, position.z);
 
 				if (position.x < startX - threadData->world->renderDistance){
-
+					firstCoord = threadData->world->chunkCoords[z];
+					for (int i = 0; i < threadData->world->renderDistance*2; i++)
+					{
+						threadData->world->chunkCoords[i* (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(i+1) * (threadData->world->renderDistance * 2 + 1) + z];
+					}
+					threadData->world->chunkCoords[(threadData->world->renderDistance * 2) * (threadData->world->renderDistance * 2 + 1) + z] = firstCoord;
+					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
+						startX + threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
+					
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2 - 1, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				} 
 				else if (position.x > startX + threadData->world->renderDistance){
-
+					//printf("x+\n");
 				}
 				else if (position.z < startZ - threadData->world->renderDistance){
-
+					//printf("z-\n");
 				}
 				else if (position.z > startZ + threadData->world->renderDistance){
-
+					//printf("z+\n");
 				}
 			}
 		}
+
+		for (unsigned int i = 0; i < updateSize; i++) {
+			printf("%d %d\n", updatePositions[i].x, updatePositions[i].z);
+			CreateAccurateMesh(updatePositions[i].x, updatePositions[i].z, threadData->world->chunkCoords,
+				threadData->world->chunks, threadData->world->renderDistance, threadData->world->textureMap);
+		}
+
+		free(updatePositions);
 	}
 	
 }

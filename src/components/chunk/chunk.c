@@ -42,14 +42,6 @@ struct Chunk createChunk(float x, float y, float z, float* heightMap){
 				{
 					chunk.blocks[x][z][y] = 0;
 				}
-				
-				/*
-				if (y <= height){
-					chunk.blocks[x][z][y] = 1;
-				} else {
-					chunk.blocks[x][z][y] = 0;
-				}
-				*/
 			}
 		}
 	}
@@ -57,7 +49,65 @@ struct Chunk createChunk(float x, float y, float z, float* heightMap){
 	chunk.solidMesh = createMesh();
 	chunk.transparentMesh = createMesh();
 
+	chunk.solidMesh.shouldDraw = 1;
+	chunk.transparentMesh.shouldDraw = 1;
+
 	return chunk;
+}
+
+void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMap) {
+	chunk->solidMesh.shouldDraw = 0;
+	chunk->transparentMesh.shouldDraw = 0;
+
+	chunk->position.x = x * CHUNK_WIDTH;
+	chunk->position.y = y * CHUNK_HEIGHT;
+	chunk->position.z = z * CHUNK_DEPTH;
+
+	for (int x = 0; x < CHUNK_WIDTH; x++) {
+		for (int z = 0; z < CHUNK_DEPTH; z++) {
+
+			int height = (int)heightMap[x * CHUNK_DEPTH + z]; //
+
+			for (int y = 0; y < CHUNK_HEIGHT; y++) {
+
+				if (y < 40)
+				{
+					if (y == height)
+					{
+						chunk->blocks[x][z][y] = 3;
+					}
+
+					else if (y > height)
+					{
+						chunk->blocks[x][z][y] = 4;
+					}
+
+					else
+					{
+						chunk->blocks[x][z][y] = 2;
+					}
+				}
+				else if (y == height)
+				{
+					chunk->blocks[x][z][y] = 1;
+				}
+				else if (y < height)
+				{
+					chunk->blocks[x][z][y] = 2;
+				}
+				else
+				{
+					chunk->blocks[x][z][y] = 0;
+				}
+			}
+		}
+	}
+
+	clearMesh(&chunk->solidMesh);
+	clearMesh(&chunk->transparentMesh);
+
+	//chunk->solidMesh = createMesh();
+	//chunk->transparentMesh = createMesh();
 }
 
 void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
