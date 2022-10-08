@@ -68,6 +68,7 @@ void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMa
 
 			int height = (int)heightMap[x * CHUNK_DEPTH + z]; //
 
+
 			for (int y = 0; y < CHUNK_HEIGHT; y++) {
 
 				if (y < 40)
@@ -102,17 +103,11 @@ void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMa
 			}
 		}
 	}
-
-	clearMesh(&chunk->solidMesh);
-	clearMesh(&chunk->transparentMesh);
-
-	//chunk->solidMesh = createMesh();
-	//chunk->transparentMesh = createMesh();
 }
 
 void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 	unsigned short int* rightChunk, unsigned short int* backChunk, unsigned short int* frontChunk, 
- 	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP){
+ 	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP, struct UpdateArray* updateArray){
 
 	int solidSize = 0;
 	int transparentSize = 0;
@@ -152,39 +147,41 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 			}
 		}
 	}
-	
 
-	
-	//float*reallocedSolidVertices;
-	//float*reallocedTransparentVertices;
+	printf("%d %d\n", solidSize, transparentSize);
 
-	//printf("%d %d\n", solidSize, transparentSize);
+	float* reallocSolid = (float*)realloc(solidVertices, (solidSize+1)*sizeof(float));
+	float* reallocTransparent = (float*)realloc(transparentVertices, (transparentSize+1) * sizeof(float));
 
-	/*
-	if (solidSize > 0){
-		float*reallocedSolidVertices = (float*)realloc(solidVertices, solidSize*sizeof(float));
-		if (reallocedSolidVertices == NULL){
-			printf("realloc fail");
-		}
+	printf("values: %f %f\n", reallocSolid[0], reallocTransparent[0]);
+
+	if (reallocSolid == NULL || reallocTransparent == NULL) {
+		printf("error reallocating memory\n");
 	}
-	
-	if (transparentSize > 0){
-		float*reallocedTransparentVertices = (float*)realloc(transparentVertices, transparentSize*sizeof(float));
-		if (reallocedTransparentVertices == NULL){
-			printf("realloc fail");
-		}
+
+	if (updateArray == NULL) {
+		fillMesh(&chunk->solidMesh, reallocSolid, solidSize);
+		fillMesh(&chunk->transparentMesh, reallocTransparent, transparentSize);
+
+		chunk->solidMesh.shouldDraw = 1;
+		chunk->transparentMesh.shouldDraw = 1;
+
+		free(reallocSolid);
+		free(reallocTransparent);
 	}
-	*/
+	else {
 
-	//printf("%f ", solidVertices[0]);
+		struct UpdateItem update = (struct UpdateItem){ chunk, reallocSolid, reallocTransparent, solidSize, transparentSize };
+		updateArray->items[updateArray->size] = update;
+		updateArray->size++;
+	}
 
-	fillMesh(&chunk->solidMesh, solidVertices, solidSize);
-	fillMesh(&chunk->transparentMesh, transparentVertices, transparentSize);
-
-	free(solidVertices);
-	free(transparentVertices);
 	//printf("??");
 	//printf("\n%d\n", sizeof(float)*VERTICE_SIZE*NUMBER_OF_VERTICES*CHUNK_WIDTH*CHUNK_DEPTH*CHUNK_HEIGHT);
+}
+
+void chunkFillMesh(struct Mesh* mesh, float* vertices, int size) {
+	fillMesh(mesh, vertices, size);
 }
 
 void drawChunkSolid(struct Chunk* chunk, struct Shader* shader){

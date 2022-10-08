@@ -34,6 +34,9 @@
 
 #ifndef cglm_io_h
 #define cglm_io_h
+
+#pragma warning(disable : 4996)
+
 #if defined(DEBUG) || defined(_DEBUG) \
    || defined(CGLM_DEFINE_PRINTS) || defined(CGLM_LIB_SRC) \
    || defined(CGLM_NO_PRINTS_NOOP)

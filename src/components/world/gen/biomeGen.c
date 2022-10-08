@@ -14,6 +14,8 @@ struct World createWorld(int renderDistance, vec3s cameraPosition, struct texCoo
 	//printf("%d\n", sizeof(struct Chunk));
 	struct Biome biome = defaultBiome();
 
+	world.worldBiome = biome;
+
 	//init chunks
 	int x_ = 0;
 	int z_ = 0;
@@ -61,7 +63,7 @@ void initChunkMeshes(struct Tuple* chunkCoords, struct Chunk* chunks, int render
 	for (int x = 0; x < renderDistance * 2 + 1; x++){
 		for (int z = 0; z < renderDistance * 2 + 1; z++)
 		{
-			CreateAccurateMesh(x, z, chunkCoords, chunks, renderDistance, TEXTURE_MAP);
+			CreateAccurateMesh(x, z, chunkCoords, chunks, renderDistance, TEXTURE_MAP, NULL);
 		}
 	}
 }
@@ -78,12 +80,15 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 
 	struct Tuple * updatePositions;
 	unsigned int updateSize; // number of chunks to update
+	struct UpdateArray updateArray;
 
 	while(*threadData->shouldRun){
 		Sleep(20);
 
 		updatePositions = (struct Tuple*)malloc((threadData->world->renderDistance * 2 + 1) * (threadData->world->renderDistance * 2 + 1) * sizeof(struct Tuple));
-		
+		updateArray.items = (struct UpdateItem*)malloc((threadData->world->renderDistance * 2 + 1) * (threadData->world->renderDistance * 2 + 1) * sizeof(struct UpdateItem));
+		updateArray.size = 0;
+
 		if (updatePositions == NULL) {
 			printf("Malloc failed\n");
 		}
@@ -115,10 +120,13 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 						threadData->world->chunkCoords[i* (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(i+1) * (threadData->world->renderDistance * 2 + 1) + z];
 					}
 					threadData->world->chunkCoords[(threadData->world->renderDistance * 2) * (threadData->world->renderDistance * 2 + 1) + z] = firstCoord;
+
+					fillHeightMap(&threadData->world->heightMap, startX + threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
+
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
 						startX + threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
 					
-					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
+					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2 - 1, z });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				} 
@@ -137,7 +145,17 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 		for (unsigned int i = 0; i < updateSize; i++) {
 			printf("%d %d\n", updatePositions[i].x, updatePositions[i].z);
 			CreateAccurateMesh(updatePositions[i].x, updatePositions[i].z, threadData->world->chunkCoords,
-				threadData->world->chunks, threadData->world->renderDistance, threadData->world->textureMap);
+				threadData->world->chunks, threadData->world->renderDistance, threadData->world->textureMap, &updateArray);
+		}
+
+		if (updateSize > 0) {
+			printf("adding updates\n\n\n");
+
+			threadData->updateArray->updateQue[threadData->updateArray->size] = updateArray;
+			threadData->updateArray->size++;
+		}
+		else {
+			free(updateArray.items);
 		}
 
 		free(updatePositions);
@@ -145,7 +163,7 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 	
 }
 
-void CreateAccurateMesh(int x, int z, struct Tuple* chunkCoords, struct Chunk* chunks, int renderDistance, struct texCoord* TEXTURE_MAP){
+void CreateAccurateMesh(int x, int z, struct Tuple* chunkCoords, struct Chunk* chunks, int renderDistance, struct texCoord* TEXTURE_MAP, struct UpdateArray* updateArray){
 	unsigned short int emptyChunk[CHUNK_WIDTH][CHUNK_DEPTH][CHUNK_HEIGHT] = {0};
 	
 	// init to false
@@ -206,7 +224,7 @@ void CreateAccurateMesh(int x, int z, struct Tuple* chunkCoords, struct Chunk* c
 
 	createChunkMesh(&chunks[realCoord.x*(renderDistance*2+1)+realCoord.z], leftChunk,
 	 rightChunk, backChunk, frontChunk,
-	 noLeftChunk, noRightChunk, noBackChunk, noFrontChunk, TEXTURE_MAP);
+	 noLeftChunk, noRightChunk, noBackChunk, noFrontChunk, TEXTURE_MAP, updateArray);
 }
 
 void renderWorld(struct World* world, struct Shader* shader){

@@ -12,10 +12,12 @@ struct Mesh{
 	GLuint VBO;
 	GLsizei size;
 	int shouldDraw;
+	int shouldUpdate;
 };
 
 struct Mesh createMesh();
 void fillMesh(struct Mesh* mesh, float* vertices, int size);
+void updateMesh(struct Mesh* mesh, float* vertices, int size);
 void draw(struct Mesh* mesh);
 void clearMesh(struct Mesh* mesh);
 #endif

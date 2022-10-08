@@ -8,6 +8,7 @@
 #include "../world/textureMapper.h"
 #include "../world/clock.h"
 #include "../camera/camera.h"
+#include "../chunk/chunk.h"
 #include "../world/gen/biomeGen.h"
 #include <Windows.h>
 
@@ -24,6 +25,8 @@
 #define CAMERA_START_X 0
 #define CAMERA_START_Z 3
 #define CAMERA_START_Y 0
+
+#define UPDATE_QUE_SIZE 10
 
 struct GameState{
 	struct Shader defaultShader;

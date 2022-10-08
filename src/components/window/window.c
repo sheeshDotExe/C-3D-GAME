@@ -98,6 +98,31 @@ int initWindow(int width, int height){
 	return 0;
 }
 
+static void _checkUpdate(struct ChunkUpdateArray* updateArray) {
+	
+	for (int i = 0; i < updateArray->size; i++) {
+		struct UpdateArray* currentUpdate = &updateArray->updateQue[i];
+		//printf("listsize: %d\n", currentUpdate->size);
+		for (int j = 0; j < currentUpdate->size; j++) {
+			//printf("index: %d\n", j);
+			struct UpdateItem* update = &currentUpdate->items[j];
+			//printf("size: %d\n", update->size);
+			chunkFillMesh(&update->chunk->solidMesh, update->solidVertices, update->solidSize);
+			chunkFillMesh(&update->chunk->transparentMesh, update->transparentVertices, update->tranparentSize);
+
+			update->chunk->solidMesh.shouldDraw = 1;
+			update->chunk->transparentMesh.shouldDraw = 1;
+
+			free(update->solidVertices);
+			free(update->transparentVertices);
+		}
+		free(currentUpdate->items);
+		currentUpdate->size = 0;
+	}
+	updateArray->size = 0;
+	
+}
+
 void windowLoop(struct GameState* gameState){
 
 	useShader(&gameState->defaultShader);
@@ -107,12 +132,18 @@ void windowLoop(struct GameState* gameState){
 
 	setProjectionMatrix(&window.camera);
 
+	//buffer chunk updates
+	struct ChunkUpdateArray updateArray;
+	updateArray.size = 0;
+	updateArray.updateQue = (struct UpdateArray*)malloc(UPDATE_QUE_SIZE*sizeof(struct UpdateArray));
+
 	int threadRunning = 1;
 
 	struct UpdateThreadData updateData;
 	updateData.world = &gameState->world;
 	updateData.shouldRun = &threadRunning;
 	updateData.playerPosition = &window.camera.position;
+	updateData.updateArray = &updateArray;
 
 	HANDLE updateThread = CreateThread(NULL, 0, chunkUpdateThread, (void*)&updateData, 0, NULL);
 
@@ -135,6 +166,7 @@ void windowLoop(struct GameState* gameState){
 
 		processInput(window.windowHandle, deltaTime);
 		
+		_checkUpdate(&updateArray);
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
