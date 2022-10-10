@@ -136,7 +136,21 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				} 
 				else if (position.x > startX + threadData->world->renderDistance){
-					//printf("x+\n");
+					firstCoord = threadData->world->chunkCoords[threadData->world->renderDistance * 2 *(threadData->world->renderDistance * 2 + 1)+z];
+					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
+					{
+						threadData->world->chunkCoords[(threadData->world->renderDistance * 2 - i) * (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(threadData->world->renderDistance * 2 - (i + 1)) * (threadData->world->renderDistance * 2 + 1) + z];
+					}
+					threadData->world->chunkCoords[z] = firstCoord;
+
+					fillHeightMap(&threadData->world->heightMap, startX - threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
+
+					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
+						startX - threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
+
+					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
+					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 1, z });
+					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				}
 				else if (position.z < startZ - threadData->world->renderDistance){
 					//printf("z-\n");
