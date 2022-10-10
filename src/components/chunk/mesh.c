@@ -19,7 +19,7 @@ struct Mesh createMesh(){
 }
 
 void updateMesh(struct Mesh* mesh, float* vertices, int size) {
-	printf("update %d %d %d\n", size, mesh->VAO, mesh->VBO);
+	//printf("update %d %d %d\n", size, mesh->VAO, mesh->VBO);
 	mesh->size = size;
 	glBindVertexArray(mesh->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
@@ -37,7 +37,7 @@ void fillMesh(struct Mesh* mesh, float* vertices, int size){
 		mesh->shouldUpdate = 1;
 	}
 
-	printf("fill %d %d %d\n", mesh->VAO, mesh->VBO, size);
+	//printf("fill %d %d %d\n", mesh->VAO, mesh->VBO, size);
 
 	mesh->size = size;
 	glBindVertexArray(mesh->VAO);

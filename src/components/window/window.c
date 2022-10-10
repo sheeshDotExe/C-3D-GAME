@@ -101,7 +101,7 @@ int initWindow(int width, int height){
 static void _checkUpdate(struct UpdateItem** updateArray) {
 
 	if ((*updateArray)->isFilled) {
-		printf("log: %d %d\n", (*updateArray)->solidSize, (*updateArray)->tranparentSize);
+		//printf("log: %d %d\n", (*updateArray)->solidSize, (*updateArray)->tranparentSize);
 
 		chunkFillMesh(&(*updateArray)->chunk->solidMesh, (*updateArray)->solidVertices, (*updateArray)->solidSize);
 		chunkFillMesh(&(*updateArray)->chunk->transparentMesh, (*updateArray)->transparentVertices, (*updateArray)->tranparentSize);
