@@ -36,8 +36,23 @@ int run(){
 }
 
 int getLaunchOptions(struct LaunchOptions* launchOptions){
-	launchOptions->width = DEFAULT_WIDTH;
-	launchOptions->height = DEFAULT_HEIGHT;
+	
+	int width = GetSystemMetrics(SM_CXFULLSCREEN);
+	if (width == 0) {
+		launchOptions->width = DEFAULT_WIDTH;
+	}
+	else {
+		launchOptions->width = width;
+	}
+
+	int height = GetSystemMetrics(SM_CYFULLSCREEN);
+	if (height == 0) {
+		launchOptions->height = DEFAULT_HEIGHT;
+	}
+	else {
+		launchOptions->height = height;
+	}
+	
 
 	const char* resourcesPath = "/C-3D-GAME/src/resources/";
 

@@ -10,10 +10,11 @@
 #include "../components/spritemap/spritemap.h"
 
 #include <windows.h>
+#include <WinUser.h>
 
-#define DEFAULT_WIDTH 1440
+#define DEFAULT_WIDTH 1920
 #define DEFAULT_HEIGHT 1080
-#define RENDER_DISTANCE 20
+#define RENDER_DISTANCE 4
 
 struct LaunchOptions{
 	int width, height;

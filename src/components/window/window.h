@@ -26,7 +26,7 @@
 #define CAMERA_START_Z 3
 #define CAMERA_START_Y 0
 
-#define UPDATE_QUE_SIZE 10
+#define UPDATE_QUEUE_SIZE 100
 
 struct GameState{
 	struct Shader defaultShader;

@@ -42,6 +42,6 @@ struct Biome defaultBiome();
 void initChunkCoords(struct Tuple* chunkCoords, int renderDistance);
 void initChunkMeshes(struct Tuple* chunkCoords, struct Chunk* chunks, int renderDistance, struct texCoord* TEXTURE_MAP);
 DWORD WINAPI chunkUpdateThread(LPVOID ThreadData);
-void CreateAccurateMesh(int x, int z, struct Tuple* chunkCoords, struct Chunk* chunks, int renderDistance, struct texCoord* TEXTURE_MAP, struct UpdateArray* updateArray);
+void CreateAccurateMesh(int x, int z, struct Tuple* chunkCoords, struct Chunk* chunks, int renderDistance, struct texCoord* TEXTURE_MAP, struct UpdateItem** updateArray);
 void renderWorld(struct World* world, struct Shader* shader);
 #endif

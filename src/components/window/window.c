@@ -98,8 +98,23 @@ int initWindow(int width, int height){
 	return 0;
 }
 
-static void _checkUpdate(struct ChunkUpdateArray* updateArray) {
-	
+static void _checkUpdate(struct UpdateItem** updateArray) {
+
+	if ((*updateArray)->isFilled) {
+		printf("log: %d %d\n", (*updateArray)->solidSize, (*updateArray)->tranparentSize);
+
+		chunkFillMesh(&(*updateArray)->chunk->solidMesh, (*updateArray)->solidVertices, (*updateArray)->solidSize);
+		chunkFillMesh(&(*updateArray)->chunk->transparentMesh, (*updateArray)->transparentVertices, (*updateArray)->tranparentSize);
+
+		(*updateArray)->chunk->solidMesh.shouldDraw = 1;
+		(*updateArray)->chunk->transparentMesh.shouldDraw = 1;
+
+		free((*updateArray)->solidVertices);
+		free((*updateArray)->transparentVertices);
+
+		*updateArray = (*updateArray)->next;
+	}
+	/*
 	for (int i = 0; i < updateArray->size; i++) {
 		struct UpdateArray* currentUpdate = &updateArray->updateQue[i];
 		//printf("listsize: %d\n", currentUpdate->size);
@@ -120,6 +135,7 @@ static void _checkUpdate(struct ChunkUpdateArray* updateArray) {
 		currentUpdate->size = 0;
 	}
 	updateArray->size = 0;
+	*/
 	
 }
 
@@ -133,9 +149,8 @@ void windowLoop(struct GameState* gameState){
 	setProjectionMatrix(&window.camera);
 
 	//buffer chunk updates
-	struct ChunkUpdateArray updateArray;
-	updateArray.size = 0;
-	updateArray.updateQue = (struct UpdateArray*)malloc(UPDATE_QUE_SIZE*sizeof(struct UpdateArray));
+	struct UpdateItem* updateArray = malloc(sizeof(struct UpdateItem));
+	updateArray->isFilled = 0;
 
 	int threadRunning = 1;
 
@@ -143,7 +158,7 @@ void windowLoop(struct GameState* gameState){
 	updateData.world = &gameState->world;
 	updateData.shouldRun = &threadRunning;
 	updateData.playerPosition = &window.camera.position;
-	updateData.updateArray = &updateArray;
+	updateData.updateArray = updateArray;
 
 	HANDLE updateThread = CreateThread(NULL, 0, chunkUpdateThread, (void*)&updateData, 0, NULL);
 

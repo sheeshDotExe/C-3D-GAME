@@ -55,7 +55,10 @@ void useShader(struct Shader* shader){
 	glUseProgram(shader->ID);
 }
 
-void setBool(struct Shader* shader, char*name, int value);
+void setBool(struct Shader* shader, char*name, int value) {
+	glUniform1i(glGetUniformLocation(shader->ID, name), value);
+}
+
 void setInt(struct Shader* shader, char*name, int value);
 
 void setFloat(struct Shader* shader, char*name, float value){

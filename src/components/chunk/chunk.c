@@ -107,7 +107,7 @@ void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMa
 
 void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 	unsigned short int* rightChunk, unsigned short int* backChunk, unsigned short int* frontChunk, 
- 	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP, struct UpdateArray* updateArray){
+ 	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP, struct UpdateItem** updateArray){
 
 	int solidSize = 0;
 	int transparentSize = 0;
@@ -148,12 +148,8 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 		}
 	}
 
-	printf("%d %d\n", solidSize, transparentSize);
-
 	float* reallocSolid = (float*)realloc(solidVertices, (solidSize+1)*sizeof(float));
 	float* reallocTransparent = (float*)realloc(transparentVertices, (transparentSize+1) * sizeof(float));
-
-	printf("values: %f %f\n", reallocSolid[0], reallocTransparent[0]);
 
 	if (reallocSolid == NULL || reallocTransparent == NULL) {
 		printf("error reallocating memory\n");
@@ -170,10 +166,17 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 		free(reallocTransparent);
 	}
 	else {
-
-		struct UpdateItem update = (struct UpdateItem){ chunk, reallocSolid, reallocTransparent, solidSize, transparentSize };
-		updateArray->items[updateArray->size] = update;
-		updateArray->size++;
+		
+		(*updateArray)->chunk = chunk;
+		(*updateArray)->solidVertices = reallocSolid;
+		(*updateArray)->transparentVertices = reallocTransparent;
+		(*updateArray)->solidSize = solidSize;
+		(*updateArray)->tranparentSize = transparentSize;
+		printf("add %d %d %d %d\n", solidSize, transparentSize, chunk->solidMesh.VAO, chunk->transparentMesh.VAO);
+		(*updateArray)->isFilled = 1;
+		(*updateArray)->next = malloc(sizeof(struct UpdateItem));
+		*updateArray = (*updateArray)->next;
+		(*updateArray)->isFilled = 0;
 	}
 
 	//printf("??");
@@ -188,21 +191,16 @@ void drawChunkSolid(struct Chunk* chunk, struct Shader* shader){
 	// set model matrix
 	mat4s model = glms_translate(glms_mat4_identity(), chunk->position);
 	setMat4(shader, (char*)"model", model);
+	setBool(shader, (char*)"showLight", 1);
 
 	draw(&chunk->solidMesh);
 }
 
 void drawChunkTransparent(struct Chunk* chunk, struct Shader* shader){
 	mat4s model = glms_translate(glms_mat4_identity(), chunk->position);
-	//printf("%f %f %f\n", chunk->position.x, chunk->position.y, chunk->position.z);
-	/*
-	printf("%f %f %f %f\n", model.m00, model.m01, model.m02, model.m03);
-	printf("%f %f %f %f\n", model.m10, model.m11, model.m12, model.m13);
-	printf("%f %f %f %f\n", model.m20, model.m21, model.m22, model.m23);
-	printf("%f %f %f %f\n", model.m30, model.m31, model.m32, model.m33);
-	printf("\n\n");
-	*/
+
 	setMat4(shader, (char*)"model", model);
+	setBool(shader, (char*)"showLight", 0);
 
 	glEnable(GL_BLEND);
 	glBlendColor(0.0f, 0.0f, 0.0f, 0.5f);
