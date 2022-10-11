@@ -172,7 +172,7 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 		(*updateArray)->transparentVertices = reallocTransparent;
 		(*updateArray)->solidSize = solidSize;
 		(*updateArray)->tranparentSize = transparentSize;
-		printf("add %d %d %d %d\n", solidSize, transparentSize, chunk->solidMesh.VAO, chunk->transparentMesh.VAO);
+		//printf("add %d %d %d %d\n", solidSize, transparentSize, chunk->solidMesh.VAO, chunk->transparentMesh.VAO);
 		(*updateArray)->isFilled = 1;
 		(*updateArray)->next = malloc(sizeof(struct UpdateItem));
 		*updateArray = (*updateArray)->next;

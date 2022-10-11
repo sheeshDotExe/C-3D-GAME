@@ -21,7 +21,7 @@ struct Mesh createMesh(){
 void updateMesh(struct Mesh* mesh, float* vertices, int size) {
 	//printf("update %d %d %d\n", size, mesh->VAO, mesh->VBO);
 	mesh->size = size;
-	glBindVertexArray(mesh->VAO);
+	//glBindVertexArray(mesh->VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, mesh->VBO);
 	glBufferData(GL_ARRAY_BUFFER, size * sizeof(float), vertices, GL_DYNAMIC_DRAW);
 	glBindVertexArray(0);
