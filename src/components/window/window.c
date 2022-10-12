@@ -99,9 +99,9 @@ int initWindow(int width, int height){
 }
 
 static void _checkUpdate(struct UpdateItem** updateArray, int renderAll, int* upateCount) {
-	(*upateCount)++;
 	if (renderAll == 1) {
 		while ((*updateArray)->isFilled) {
+			(*upateCount)++;
 			//printf("log: %d %d\n", (*updateArray)->solidSize, (*updateArray)->tranparentSize);
 
 			chunkFillMesh(&(*updateArray)->chunk->solidMesh, (*updateArray)->solidVertices, (*updateArray)->solidSize);
@@ -120,6 +120,7 @@ static void _checkUpdate(struct UpdateItem** updateArray, int renderAll, int* up
 	}
 
 	if ((*updateArray)->isFilled) {
+		(*upateCount)++;
 		//printf("log: %d %d\n", (*updateArray)->solidSize, (*updateArray)->tranparentSize);
 
 		chunkFillMesh(&(*updateArray)->chunk->solidMesh, (*updateArray)->solidVertices, (*updateArray)->solidSize);
@@ -176,9 +177,8 @@ void windowLoop(struct GameState* gameState){
 			gcvt(gameState->clock.currentFps, 5, fpsBuffer);
 			glfwSetWindowTitle(window.windowHandle, (const char*)fpsBuffer);
 			startTime = glfwGetTime();
-			printf("update: %d\n", updateCount);
+			//printf("update: %d\n", updateCount);
 		}
-		
 
 		processInput(window.windowHandle, deltaTime);
 
@@ -187,7 +187,9 @@ void windowLoop(struct GameState* gameState){
 			printf("press %d\n", renderAll);
 		}
 		
-		_checkUpdate(&updateArray, renderAll, &updateCount);
+		for (int i = 0; i < 4; i++) {
+			_checkUpdate(&updateArray, renderAll, &updateCount);
+		}
 
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

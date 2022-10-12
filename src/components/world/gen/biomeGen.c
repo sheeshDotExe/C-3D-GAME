@@ -132,8 +132,9 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 						startX + threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
 					
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2 - 1, z });
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2 - 1, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
+					//printf("update ");
 				} 
 				else if (position.x > startX + threadData->world->renderDistance){
 					firstCoord = threadData->world->chunkCoords[threadData->world->renderDistance * 2 *(threadData->world->renderDistance * 2 + 1)+z];
@@ -148,8 +149,8 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
 						startX - threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
 
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 1, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 1, z });
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				}
 				else if (position.z < startZ - threadData->world->renderDistance){
@@ -166,8 +167,8 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 						position.x, position.y, startZ + threadData->world->renderDistance, (float*)threadData->world->heightMap.map);
 
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2});
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2 - 1});
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , 0 });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2 - 1});
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , 0 });
 				}
 				else if (position.z > startZ + threadData->world->renderDistance){
 					firstCoord = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2];
@@ -182,8 +183,8 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
 						position.x, position.y, startZ - threadData->world->renderDistance, (float*)threadData->world->heightMap.map);
 
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, threadData->world->renderDistance * 2 });
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 1 });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, threadData->world->renderDistance * 2 });
+					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 1 });
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 0 });
 				}
 			}
