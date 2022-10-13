@@ -4,7 +4,7 @@
 #include "../../../resources/cglm/cglm.h"
 #include "../../../resources/cglm/struct.h"
 #include "../../../resources/noise/noise.h"
-#include "../../chunk/chunk.h"
+#include "../../../utils/types.h"
 #include <math.h>
 
 struct HeightMap{

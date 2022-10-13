@@ -187,7 +187,7 @@ void windowLoop(struct GameState* gameState){
 			printf("press %d\n", renderAll);
 		}
 		
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 1; i++) {
 			_checkUpdate(&updateArray, renderAll, &updateCount);
 		}
 
@@ -202,5 +202,6 @@ void windowLoop(struct GameState* gameState){
 		glfwPollEvents();
 
 	}
+	threadRunning = 0;
 	glfwTerminate();
 }

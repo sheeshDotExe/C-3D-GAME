@@ -55,9 +55,9 @@ struct Chunk createChunk(float x, float y, float z, float* heightMap){
 	return chunk;
 }
 
-void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMap) {
-	chunk->solidMesh.shouldDraw = 0;
-	chunk->transparentMesh.shouldDraw = 0;
+void updateChunk(struct Chunk* chunk, float x, float y, float z) {
+	chunk->solidMesh.shouldDraw = 1;
+	chunk->transparentMesh.shouldDraw = 1;
 
 	chunk->position.x = x * CHUNK_WIDTH;
 	chunk->position.y = y * CHUNK_HEIGHT;
@@ -66,8 +66,9 @@ void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMa
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
 		for (int z = 0; z < CHUNK_DEPTH; z++) {
 
-			int height = (int)heightMap[x * CHUNK_DEPTH + z]; //
+			int height = (int)chunk->heightMap.map[x * CHUNK_DEPTH + z]; //
 
+			printf("%d ", height);
 
 			for (int y = 0; y < CHUNK_HEIGHT; y++) {
 
@@ -115,10 +116,12 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 	float* solidVertices = (float*)malloc(sizeof(float)*VERTICE_SIZE*NUMBER_OF_VERTICES*CHUNK_WIDTH*CHUNK_DEPTH*CHUNK_HEIGHT);
 	if (solidVertices == NULL){
 		printf("error");
+		MessageBox(NULL, "error", NULL, MB_OK);
 	}
 	float* transparentVertices = (float*)malloc(sizeof(float)*VERTICE_SIZE*NUMBER_OF_VERTICES*CHUNK_WIDTH*CHUNK_DEPTH*CHUNK_HEIGHT);
 	if (transparentVertices == NULL){
 		printf("error2");
+		MessageBox(NULL, "error", NULL, MB_OK);
 	}
 
 	unsigned int transparentCollisionCheck[2] = {0, 0};
@@ -153,6 +156,7 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 
 	if (reallocSolid == NULL || reallocTransparent == NULL) {
 		printf("error reallocating memory\n");
+		MessageBox(NULL, "error", NULL, MB_OK);
 	}
 
 	if (updateArray == NULL) {

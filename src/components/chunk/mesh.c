@@ -6,12 +6,8 @@ struct Mesh createMesh(){
 	mesh.VAO = 0;
 	mesh.VBO = 0;
 
-	printf("before: %d %d\n", mesh.VAO, mesh.VBO);
-
 	glGenVertexArrays(1, &mesh.VAO);
 	glGenBuffers(1, &mesh.VBO);
-
-	printf("new: %d %d\n", mesh.VAO, mesh.VBO);
 
 	glBindVertexArray(0);
 

@@ -74,6 +74,16 @@ static void _addUpdate(struct Tuple* map, unsigned int* pos, struct Tuple value)
 	(*pos)++;
 }
 
+static int _tupleCompare(struct Tuple* first, struct Tuple* second) {
+	if (first->x != second->x) {
+		return 0;
+	}
+	if (first->z != second->z) {
+		return 0;
+	}
+	return 1;
+}
+
 DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 	struct UpdateThreadData* threadData = (struct UpdateThreadData*)ThreadData;
 	
@@ -104,9 +114,9 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 
 		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++)
 		{
-			for (int z = 0; z < threadData->world->renderDistance * 2 + 1; z++){
-				chunkPosition = threadData->world->chunkCoords[x*(threadData->world->renderDistance*2+1)+z];
-				position = threadData->world->chunks[chunkPosition.x*(threadData->world->renderDistance*2+1)+chunkPosition.z].position;
+			for (int z = 0; z < threadData->world->renderDistance * 2 + 1; z++) {
+				chunkPosition = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + z];
+				position = threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].position;
 				position.x /= CHUNK_WIDTH;
 				position.y /= CHUNK_HEIGHT;
 				position.z /= CHUNK_DEPTH;
@@ -118,59 +128,89 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].forceRender = 0;
 				}
 
-				if (position.x < startX - threadData->world->renderDistance){
+				if (position.x < startX - threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[z])) {
 					firstCoord = threadData->world->chunkCoords[z];
-					for (int i = 0; i < threadData->world->renderDistance*2; i++)
+					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
-						threadData->world->chunkCoords[i* (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(i+1) * (threadData->world->renderDistance * 2 + 1) + z];
+						threadData->world->chunkCoords[i * (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(i + 1) * (threadData->world->renderDistance * 2 + 1) + z];
 					}
 					threadData->world->chunkCoords[(threadData->world->renderDistance * 2) * (threadData->world->renderDistance * 2 + 1) + z] = firstCoord;
 
-					fillHeightMap(&threadData->world->heightMap, startX + threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
+					fillHeightMap(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].heightMap, startX + threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
 
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
-						startX + threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
-					
+						startX + threadData->world->renderDistance, position.y, position.z);
+
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2 - 1, z });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 					//printf("update ");
-				} 
-				else if (position.x > startX + threadData->world->renderDistance){
-					firstCoord = threadData->world->chunkCoords[threadData->world->renderDistance * 2 *(threadData->world->renderDistance * 2 + 1)+z];
+				}
+			}
+		}
+		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
+			for (int z = 0; z < threadData->world->renderDistance * 2 + 1; z++) {
+				chunkPosition = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + z];
+				position = threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].position;
+				position.x /= CHUNK_WIDTH;
+				position.y /= CHUNK_HEIGHT;
+				position.z /= CHUNK_DEPTH;
+
+				if (position.x > startX + threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[threadData->world->renderDistance * 2 * (threadData->world->renderDistance * 2 + 1) + z])) {
+					firstCoord = threadData->world->chunkCoords[threadData->world->renderDistance * 2 * (threadData->world->renderDistance * 2 + 1) + z];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
 						threadData->world->chunkCoords[(threadData->world->renderDistance * 2 - i) * (threadData->world->renderDistance * 2 + 1) + z] = threadData->world->chunkCoords[(threadData->world->renderDistance * 2 - (i + 1)) * (threadData->world->renderDistance * 2 + 1) + z];
 					}
 					threadData->world->chunkCoords[z] = firstCoord;
 
-					fillHeightMap(&threadData->world->heightMap, startX - threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
+					fillHeightMap(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].heightMap, startX - threadData->world->renderDistance, position.z, &threadData->world->worldBiome.noiseOptions, 10);
 
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
-						startX - threadData->world->renderDistance, position.y, position.z, (float*)threadData->world->heightMap.map);
+						startX - threadData->world->renderDistance, position.y, position.z);
 
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { threadData->world->renderDistance * 2, z });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 1, z });
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				}
-				else if (position.z < startZ - threadData->world->renderDistance){
+			}
+		}
+		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
+			for (int z = 0; z < threadData->world->renderDistance * 2 + 1; z++) {
+				chunkPosition = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + z];
+				position = threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].position;
+				position.x /= CHUNK_WIDTH;
+				position.y /= CHUNK_HEIGHT;
+				position.z /= CHUNK_DEPTH;
+
+				if (position.z < startZ - threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1)])) {
 					firstCoord = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1)];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
-						threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + i] = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + i+1];
+						threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + i] = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + i + 1];
 					}
 					threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2] = firstCoord;
 
-					fillHeightMap(&threadData->world->heightMap, position.x, startZ + threadData->world->renderDistance, &threadData->world->worldBiome.noiseOptions, 10);
+					fillHeightMap(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].heightMap, position.x, startZ + threadData->world->renderDistance, &threadData->world->worldBiome.noiseOptions, 10);
 
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
-						position.x, position.y, startZ + threadData->world->renderDistance, (float*)threadData->world->heightMap.map);
+						position.x, position.y, startZ + threadData->world->renderDistance);
 
-					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2});
+					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, threadData->world->renderDistance * 2 });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2 - 1});
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , 0 });
 				}
-				else if (position.z > startZ + threadData->world->renderDistance){
+			}
+		}
+		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
+			for (int z = 0; z < threadData->world->renderDistance * 2 + 1; z++) {
+				chunkPosition = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + z];
+				position = threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].position;
+				position.x /= CHUNK_WIDTH;
+				position.y /= CHUNK_HEIGHT;
+				position.z /= CHUNK_DEPTH;
+
+				if (position.z > startZ + threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2])){
 					firstCoord = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
@@ -178,10 +218,10 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					}
 					threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1)] = firstCoord;
 
-					fillHeightMap(&threadData->world->heightMap, position.x, startZ - threadData->world->renderDistance, &threadData->world->worldBiome.noiseOptions, 10);
+					fillHeightMap(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].heightMap, position.x, startZ - threadData->world->renderDistance, &threadData->world->worldBiome.noiseOptions, 10);
 
 					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
-						position.x, position.y, startZ - threadData->world->renderDistance, (float*)threadData->world->heightMap.map);
+						position.x, position.y, startZ - threadData->world->renderDistance);
 
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, threadData->world->renderDistance * 2 });
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 1 });

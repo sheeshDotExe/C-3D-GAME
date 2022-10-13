@@ -9,11 +9,15 @@
 #include "../../utils/types.h"
 #include "../spritemap/spritemap.h"
 #include "../shaders/shaderProgram.h"
+#include "../world/gen/heightMap.h"
+
+#include <Windows.h>
 
 struct Chunk{
 	vec3s position;
 	struct Mesh solidMesh;
 	struct Mesh transparentMesh;
+	struct HeightMap heightMap;
 	unsigned short int blocks[CHUNK_WIDTH][CHUNK_DEPTH][CHUNK_HEIGHT];
 	unsigned short int forceRender;
 };
@@ -36,6 +40,6 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
  	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP,struct UpdateItem** updateArray);
 void drawChunkSolid(struct Chunk* chunk, struct Shader* shader);
 void drawChunkTransparent(struct Chunk* chunk, struct Shader* shader);
-void updateChunk(struct Chunk* chunk, float x, float y, float z, float* heightMap);
+void updateChunk(struct Chunk* chunk, float x, float y, float z);
 void chunkFillMesh(struct Mesh* mesh, float* vertices, int size);
 #endif
