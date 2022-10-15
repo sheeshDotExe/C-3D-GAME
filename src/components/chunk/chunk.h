@@ -34,7 +34,7 @@ struct UpdateItem {
 	struct UpdateItem* next;
 };
 
-struct Chunk createChunk(float x, float y, float z, float* heightMap);
+struct Chunk createChunk();
 void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 	unsigned short int* rightChunk, unsigned short int* backChunk, unsigned short int* frontChunk, 
  	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, struct texCoord* TEXTURE_MAP,struct UpdateItem** updateArray);

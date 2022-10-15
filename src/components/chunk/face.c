@@ -15,28 +15,28 @@ static int _in(int first, unsigned int* second)
 void addVertices(float* output, int* outputSize, unsigned short int* leftchunk,
 	unsigned short int* rightchunk, unsigned short int* backchunk, unsigned short int* frontchunk, 
  	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, int x, int y, int z,
- 	unsigned short int* blocks, unsigned int* check, struct texCoord* TEXTURE_MAP){
+ 	unsigned short int* blocks, unsigned int* check, struct texCoord* TEXTURE_MAP, int height){
 
 	//struct texCoord texture = TEXTURE_MAP[blocks[x*z*y]];
 	struct texCoord texture = TEXTURE_MAP[blocks[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y]];
 	//printf("%d %d\n", texture.xTop, texture.yTop);
 	
-	if ((x == 0 && (!noLeftChunk && _in(leftchunk[(CHUNK_WIDTH-1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check))) || (x != 0 && _in(blocks[(x-1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check)))
+	if ((x == 0 && ((!noLeftChunk && _in(leftchunk[(CHUNK_WIDTH-1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check))) || (noLeftChunk && x==0 && y==height)) || (x != 0 && _in(blocks[(x-1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check)))
     {
 		leftside(output, outputSize, x, y, z, texture.xSide, texture.ySide);
 	}
 
-	if ((x == CHUNK_WIDTH - 1 && (!noRightChunk && _in(rightchunk[z*CHUNK_HEIGHT + y], check))) || (x != CHUNK_WIDTH - 1 && _in(blocks[(x+1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check)))
+	if ((x == CHUNK_WIDTH - 1 && ((!noRightChunk && _in(rightchunk[z*CHUNK_HEIGHT + y], check)) || (noRightChunk && x == CHUNK_WIDTH-1 && y == height))) || (x != CHUNK_WIDTH - 1 && _in(blocks[(x+1)*(CHUNK_DEPTH*CHUNK_HEIGHT) + z*CHUNK_HEIGHT + y], check)))
 	{
 		rightside(output, outputSize, x, y, z, texture.xSide, texture.ySide);
 	}
 
-	if ((z == CHUNK_DEPTH - 1 && (!noFrontChunk && _in(frontchunk[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + y], check))) || (z != CHUNK_DEPTH - 1 && _in(blocks[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (z+1)*CHUNK_HEIGHT + y], check)))
+	if ((z == CHUNK_DEPTH - 1 && ((!noFrontChunk && _in(frontchunk[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + y], check)) || (noFrontChunk && z == CHUNK_DEPTH - 1 && y == height))) || (z != CHUNK_DEPTH - 1 && _in(blocks[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (z+1)*CHUNK_HEIGHT + y], check)))
 	{
 		frontside(output, outputSize, x, y, z, texture.xSide, texture.ySide);
 	}
 
-	if ((z == 0 && (!noBackChunk && _in(backchunk[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (CHUNK_DEPTH-1)*CHUNK_HEIGHT + y], check))) || (z != 0 && _in(blocks[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (z-1)*CHUNK_HEIGHT + y], check)))
+	if ((z == 0 && ((!noBackChunk && _in(backchunk[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (CHUNK_DEPTH-1)*CHUNK_HEIGHT + y], check)) || (noBackChunk && z == 0 && y == height))) || (z != 0 && _in(blocks[x*(CHUNK_DEPTH*CHUNK_HEIGHT) + (z-1)*CHUNK_HEIGHT + y], check)))
 	{
 		backside(output, outputSize, x, y, z, texture.xSide, texture.ySide);
 	}

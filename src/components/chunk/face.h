@@ -3,6 +3,7 @@
 
 #include "../spritemap/spritemap.h"
 #include "../../utils/types.h"
+#include "../world/gen/heightMap.h"
 #include <stdio.h>
 
 struct faceOptions{
@@ -12,7 +13,7 @@ struct faceOptions{
 void addVertices(float* output, int*outputSize, unsigned short int* leftChunk,
 	unsigned short int* rightChunk, unsigned short int* backChunk, unsigned short int* frontChunk, 
  	int noLeftChunk, int noRightChunk, int noBackChunk, int noFrontChunk, int x, int y, int z,
- 	unsigned short int* blocks, unsigned int* checks, struct texCoord* TEXTURE_MAP);
+ 	unsigned short int* blocks, unsigned int* checks, struct texCoord* TEXTURE_MAP, int height);
 
 void frontside(float* vertices, int* outputSize, int x, int y, int z, float texX, float texY);
 void backside(float* vertices, int* outputSize, int x, int y, int z, float texX, float texY);

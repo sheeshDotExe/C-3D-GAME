@@ -22,8 +22,7 @@ struct World createWorld(int renderDistance, vec3s cameraPosition, struct texCoo
 	
 	for(int x = startX - renderDistance; x < startX + renderDistance + 1; x++){
 		for (int z = startZ - renderDistance; z < startZ + renderDistance + 1; z++){
-			fillHeightMap(&world.heightMap, x, z, &biome.noiseOptions, 10);
-			world.chunks[x_*(renderDistance*2+1) + z_] = createChunk(x, 0, z, (float*)world.heightMap.map);
+			world.chunks[x_*(renderDistance*2+1) + z_] = createChunk();
 			//printf("%f %f %f\n", world.chunks[x_*(renderDistance*2+1) + z_].position.x,world.chunks[x_*(renderDistance*2+1) + z_].position.y,world.chunks[x_*(renderDistance*2+1) + z_].position.z);
 			z_++;
 		}
@@ -122,7 +121,12 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 				position.z /= CHUNK_DEPTH;
 
 				if (threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].forceRender) {
-
+					
+					fillHeightMap(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].heightMap, startX - threadData->world->renderDistance + x, startZ - threadData->world->renderDistance + z, &threadData->world->worldBiome.noiseOptions, 10);
+					
+					updateChunk(&threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z],
+						startX - threadData->world->renderDistance + x, position.y, startZ - threadData->world->renderDistance + z);
+					
 					_addUpdate(updatePositions, &updateSize, chunkPosition);
 
 					threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].forceRender = 0;

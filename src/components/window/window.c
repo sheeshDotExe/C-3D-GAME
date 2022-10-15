@@ -44,6 +44,13 @@ static void processInput(GLFWwindow *windowW, float deltaTime){
 		glfwSetWindowShouldClose(windowW, true);
 	}
 
+	if (glfwGetKey(windowW, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+		window.camera.movementSpeed = CAMERA_MOVEMENT_SPEED * 2;
+	}
+	else {
+		window.camera.movementSpeed = CAMERA_MOVEMENT_SPEED;
+	}
+
 	if (glfwGetKey(windowW, GLFW_KEY_W) == GLFW_PRESS){
 		processKeyboardInput(&window.camera, FORWARD, deltaTime);
 	}
@@ -56,10 +63,10 @@ static void processInput(GLFWwindow *windowW, float deltaTime){
 	if (glfwGetKey(windowW, GLFW_KEY_D) == GLFW_PRESS){
 		processKeyboardInput(&window.camera, RIGHT, deltaTime);
 	}
-	if (glfwGetKey(windowW, GLFW_KEY_Q) == GLFW_PRESS){
+	if (glfwGetKey(windowW, GLFW_KEY_SPACE) == GLFW_PRESS){
 		processKeyboardInput(&window.camera, UP, deltaTime);
 	}
-	if (glfwGetKey(windowW, GLFW_KEY_E) == GLFW_PRESS){
+	if (glfwGetKey(windowW, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
 		processKeyboardInput(&window.camera, DOWN, deltaTime);
 	}
 }
@@ -187,7 +194,7 @@ void windowLoop(struct GameState* gameState){
 			printf("press %d\n", renderAll);
 		}
 		
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 4; i++) {
 			_checkUpdate(&updateArray, renderAll, &updateCount);
 		}
 

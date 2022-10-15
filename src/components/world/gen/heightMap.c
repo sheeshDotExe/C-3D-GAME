@@ -3,7 +3,8 @@
 void fillHeightMap(struct HeightMap* heightMap, float cX, float cZ, struct NoiseOptions* noiseOptions, int seed){
 	for (int x = 0; x < CHUNK_WIDTH; x++){
 		for (int z = 0; z < CHUNK_DEPTH; z++){
-			heightMap->map[x][z] = getNoiseAt(cX*CHUNK_WIDTH + x, cZ*CHUNK_DEPTH + z, noiseOptions, seed);
+            float value = getNoiseAt(cX * CHUNK_WIDTH + x, cZ * CHUNK_DEPTH + z, noiseOptions, seed);
+			heightMap->map[x][z] = value;
             //printf("%f ", heightMap->map[x][z]);
 		}
 	}

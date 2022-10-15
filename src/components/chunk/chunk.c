@@ -1,63 +1,17 @@
 #include "chunk.h"
 
-struct Chunk createChunk(float x, float y, float z, float* heightMap){
+struct Chunk createChunk(){
 	struct Chunk chunk;
-	chunk.position.x = x*CHUNK_WIDTH;
-	chunk.position.y = y*CHUNK_HEIGHT;
-	chunk.position.z = z*CHUNK_DEPTH;
-
-	for (int x = 0; x < CHUNK_WIDTH; x++){
-		for (int z = 0; z < CHUNK_DEPTH; z++){
-
-			int height = (int)heightMap[x*CHUNK_DEPTH + z]; //
-
-			for (int y = 0; y < CHUNK_HEIGHT; y++){
-				
-				if (y < 40)
-				{
-					if (y == height)
-					{
-						chunk.blocks[x][z][y] = 3;
-					}
-
-					else if (y > height)
-					{
-						chunk.blocks[x][z][y] = 4;
-					}
-
-					else
-					{
-						chunk.blocks[x][z][y] = 2;
-					}
-				}
-				else if (y == height)
-				{
-					chunk.blocks[x][z][y] = 1;
-				}
-				else if (y < height)
-				{
-					chunk.blocks[x][z][y] = 2;
-				}
-				else
-				{
-					chunk.blocks[x][z][y] = 0;
-				}
-			}
-		}
-	}
 
 	chunk.solidMesh = createMesh();
 	chunk.transparentMesh = createMesh();
-
-	chunk.solidMesh.shouldDraw = 1;
-	chunk.transparentMesh.shouldDraw = 1;
 
 	return chunk;
 }
 
 void updateChunk(struct Chunk* chunk, float x, float y, float z) {
-	chunk->solidMesh.shouldDraw = 1;
-	chunk->transparentMesh.shouldDraw = 1;
+	chunk->solidMesh.shouldDraw = 0;
+	chunk->transparentMesh.shouldDraw = 0;
 
 	chunk->position.x = x * CHUNK_WIDTH;
 	chunk->position.y = y * CHUNK_HEIGHT;
@@ -66,9 +20,7 @@ void updateChunk(struct Chunk* chunk, float x, float y, float z) {
 	for (int x = 0; x < CHUNK_WIDTH; x++) {
 		for (int z = 0; z < CHUNK_DEPTH; z++) {
 
-			int height = (int)chunk->heightMap.map[x * CHUNK_DEPTH + z]; //
-
-			printf("%d ", height);
+			int height = (int)chunk->heightMap.map[x][z]; //
 
 			for (int y = 0; y < CHUNK_HEIGHT; y++) {
 
@@ -137,13 +89,13 @@ void createChunkMesh(struct Chunk* chunk, unsigned short int* leftChunk,
 						addVertices(transparentVertices, &transparentSize,
 							leftChunk, rightChunk, backChunk, frontChunk,
 							noLeftChunk, noRightChunk, noBackChunk, noFrontChunk, x, y, z, (short unsigned int*)chunk->blocks,
-							(unsigned int*)transparentCollisionCheck, TEXTURE_MAP);
+							(unsigned int*)transparentCollisionCheck, TEXTURE_MAP, (int)chunk->heightMap.map[x][z]);
 					} break;
 					default:{
 						addVertices(solidVertices, &solidSize,
 							leftChunk, rightChunk, backChunk, frontChunk,
 							noLeftChunk, noRightChunk, noBackChunk, noFrontChunk, x, y, z, (short unsigned int*)chunk->blocks,
-							(unsigned int*)solidCollisionCheck, TEXTURE_MAP);
+							(unsigned int*)solidCollisionCheck, TEXTURE_MAP, (int)chunk->heightMap.map[x][z]);
 						//pass in solidVertices to addvertices
 					}
 				}
