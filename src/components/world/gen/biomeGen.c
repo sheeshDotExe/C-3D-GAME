@@ -85,8 +85,6 @@ static int _tupleCompare(struct Tuple* first, struct Tuple* second) {
 
 DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 	struct UpdateThreadData* threadData = (struct UpdateThreadData*)ThreadData;
-	
-	printf("thread start\n");
 
 	struct Tuple * updatePositions;
 	unsigned int updateSize; // number of chunks to update

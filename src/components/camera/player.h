@@ -6,7 +6,7 @@
 #include "../world/gen/biomeGen.h"
 #include "../chunk/chunk.h"
 
-#define GRAVITY 0.1
+#define GRAVITY 9.81
 
 struct Player {
 	struct Camera* camera;

@@ -126,7 +126,8 @@ void checkGravity(struct Player* player, float deltaTime) {
 	if (block == 0 || block == 4) {
 		if (player->gameMode == 0) {
 			player->velocity += GRAVITY * deltaTime;
-			player->camera->position.y -= player->velocity;
+			player->camera->position.y -= player->velocity * deltaTime;
+			//printf("%f\n", player->camera->position.y);
 		}
 	}
 	else {

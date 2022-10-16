@@ -36,7 +36,6 @@ static void _scroll_callback(GLFWwindow *windowW, double xoffset, double yoffset
 }
 
 static void _key_callback(GLFWwindow *handle, int key, int scancode, int action, int mods){
-	printf("%d ", key);
 }
 
 static void processInput(GLFWwindow *windowW, float deltaTime){
@@ -196,7 +195,6 @@ void windowLoop(struct GameState* gameState){
 
 		if (GetAsyncKeyState(0x52) & 0x01) {
 			renderAll *= -1;
-			printf("press %d\n", renderAll);
 		}
 		
 		for (int i = 0; i < 4; i++) {

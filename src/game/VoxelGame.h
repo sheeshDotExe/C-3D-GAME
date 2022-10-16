@@ -15,7 +15,7 @@
 
 #define DEFAULT_WIDTH 1920
 #define DEFAULT_HEIGHT 1080
-#define RENDER_DISTANCE 1
+#define RENDER_DISTANCE 8
 
 struct LaunchOptions{
 	int width, height;
