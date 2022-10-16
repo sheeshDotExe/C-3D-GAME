@@ -68,7 +68,7 @@ void processMouseScroll(struct Camera* camera, float yoffset){
 
 void processKeyboardInput(struct Camera* camera, enum CameraMovement direction, float deltaTime){
 	float velocity = camera->movementSpeed * deltaTime;
-	
+
 	if (direction == FORWARD)
 		camera->position = glms_vec3_add(camera->position, glms_vec3_mul((vec3s) {1,0,1}, glms_vec3_scale(camera->front, velocity)));
 	if (direction == BACKWARD)

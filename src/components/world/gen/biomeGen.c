@@ -106,6 +106,14 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 		int startY = (int)(threadData->playerPosition->y / CHUNK_HEIGHT);
 		int startZ = (int)(threadData->playerPosition->z / CHUNK_DEPTH);
 
+		//check for negative value
+		if (threadData->playerPosition->x < 0) {
+			startX -= 1;
+		}
+		if (threadData->playerPosition->z < 0) {
+			startZ -= 1;
+		}
+
 		vec3s position;
 		struct Tuple chunkPosition;
 
@@ -130,9 +138,10 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					_addUpdate(updatePositions, &updateSize, chunkPosition);
 
 					threadData->world->chunks[chunkPosition.x * (threadData->world->renderDistance * 2 + 1) + chunkPosition.z].forceRender = 0;
-				}
 
-				if (position.x < startX - threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[z])) {
+				}
+				
+				if ((int)position.x < startX - threadData->world->renderDistance ) {
 					firstCoord = threadData->world->chunkCoords[z];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
@@ -150,6 +159,7 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 					//printf("update ");
 				}
+				
 			}
 		}
 		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
@@ -159,8 +169,9 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 				position.x /= CHUNK_WIDTH;
 				position.y /= CHUNK_HEIGHT;
 				position.z /= CHUNK_DEPTH;
+				
 
-				if (position.x > startX + threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[threadData->world->renderDistance * 2 * (threadData->world->renderDistance * 2 + 1) + z])) {
+				if ((int)position.x > startX + threadData->world->renderDistance) {
 					firstCoord = threadData->world->chunkCoords[threadData->world->renderDistance * 2 * (threadData->world->renderDistance * 2 + 1) + z];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
@@ -177,6 +188,7 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { 1, z });
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { 0, z });
 				}
+				
 			}
 		}
 		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
@@ -186,8 +198,8 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 				position.x /= CHUNK_WIDTH;
 				position.y /= CHUNK_HEIGHT;
 				position.z /= CHUNK_DEPTH;
-
-				if (position.z < startZ - threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1)])) {
+				
+				if ((int)position.z < startZ - threadData->world->renderDistance ) {
 					firstCoord = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1)];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
@@ -204,6 +216,7 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , threadData->world->renderDistance * 2 - 1});
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x , 0 });
 				}
+				
 			}
 		}
 		for (int x = 0; x < threadData->world->renderDistance * 2 + 1; x++) {
@@ -213,8 +226,8 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 				position.x /= CHUNK_WIDTH;
 				position.y /= CHUNK_HEIGHT;
 				position.z /= CHUNK_DEPTH;
-
-				if (position.z > startZ + threadData->world->renderDistance && _tupleCompare(&chunkPosition, &threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2])){
+				
+				if ((int)position.z > startZ + threadData->world->renderDistance){
 					firstCoord = threadData->world->chunkCoords[x * (threadData->world->renderDistance * 2 + 1) + threadData->world->renderDistance * 2];
 					for (int i = 0; i < threadData->world->renderDistance * 2; i++)
 					{
@@ -231,6 +244,7 @@ DWORD WINAPI chunkUpdateThread(LPVOID ThreadData){
 					//_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 1 });
 					_addUpdate(updatePositions, &updateSize, (struct Tuple) { x, 0 });
 				}
+				
 			}
 		}
 

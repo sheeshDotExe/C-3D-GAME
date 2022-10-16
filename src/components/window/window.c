@@ -52,22 +52,22 @@ static void processInput(GLFWwindow *windowW, float deltaTime){
 	}
 
 	if (glfwGetKey(windowW, GLFW_KEY_W) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, FORWARD, deltaTime);
+		processMovement(&window.player, FORWARD, deltaTime);
 	}
 	if (glfwGetKey(windowW, GLFW_KEY_S) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, BACKWARD, deltaTime);
+		processMovement(&window.player, BACKWARD, deltaTime);
 	}
 	if (glfwGetKey(windowW, GLFW_KEY_A) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, LEFT, deltaTime);
+		processMovement(&window.player, LEFT, deltaTime);
 	}
 	if (glfwGetKey(windowW, GLFW_KEY_D) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, RIGHT, deltaTime);
+		processMovement(&window.player, RIGHT, deltaTime);
 	}
 	if (glfwGetKey(windowW, GLFW_KEY_SPACE) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, UP, deltaTime);
+		processMovement(&window.player, UP, deltaTime);
 	}
 	if (glfwGetKey(windowW, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS){
-		processKeyboardInput(&window.camera, DOWN, deltaTime);
+		processMovement(&window.player, DOWN, deltaTime);
 	}
 }
 
@@ -146,6 +146,9 @@ static void _checkUpdate(struct UpdateItem** updateArray, int renderAll, int* up
 }
 
 void windowLoop(struct GameState* gameState){
+	window.player = createPlayer(&window.camera, &gameState->world);
+
+	window.player.gameMode = 0;
 
 	useShader(&gameState->defaultShader);
 
@@ -176,7 +179,7 @@ void windowLoop(struct GameState* gameState){
 	double startTime = glfwGetTime();
 	while (!glfwWindowShouldClose(window.windowHandle)){
 
-		Sleep(1); // limit cpu usage (not recommended for running over 60 fps)
+		//Sleep(1); // limit cpu usage (not recommended for running over 60 fps)
 		// clockTick reqeuries a window running with an event handler
 		float deltaTime = clockTick(&gameState->clock, DEFAULT_FPS); //ensures program wont render more than parameters times per second
 		
@@ -188,6 +191,8 @@ void windowLoop(struct GameState* gameState){
 		}
 
 		processInput(window.windowHandle, deltaTime);
+
+		checkGravity(&window.player, deltaTime);
 
 		if (GetAsyncKeyState(0x52) & 0x01) {
 			renderAll *= -1;

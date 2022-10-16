@@ -6,6 +6,7 @@
 #include "../components/world/textureMapper.h"
 #include "../components/world/clock.h"
 #include "../components/camera/camera.h"
+#include "../components/camera/player.h"
 #include "../components/world/gen/biomeGen.h"
 #include "../components/spritemap/spritemap.h"
 
@@ -14,7 +15,7 @@
 
 #define DEFAULT_WIDTH 1920
 #define DEFAULT_HEIGHT 1080
-#define RENDER_DISTANCE 8
+#define RENDER_DISTANCE 1
 
 struct LaunchOptions{
 	int width, height;
