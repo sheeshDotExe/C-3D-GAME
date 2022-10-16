@@ -1,2 +1,2 @@
 # C-3D-GAME
-hello
+Opengl minecraft clone written in pure c code
